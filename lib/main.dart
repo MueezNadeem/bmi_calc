@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
@@ -405,7 +403,7 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Center(
           child: Text(
         condition,
-        style: TextStyle(fontSize: 40),
+        style: const TextStyle(fontSize: 40),
       )),
     );
   }
