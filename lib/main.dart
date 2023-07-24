@@ -493,10 +493,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               )
             ]),
-        results(bmi),
-        ElevatedButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text("Dismiss"),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Flexible(child: results(bmi)),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Dismiss"),
+            ),
+          ],
         ),
       ],
     );
