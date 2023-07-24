@@ -68,25 +68,67 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 47, 47, 47),
-      body: Column(
+        backgroundColor: const Color.fromARGB(255, 47, 47, 47),
+        body: OrientationBuilder(
+          builder: (context, orientation) {
+            if (orientation == Orientation.portrait) {
+              return portraitDesign(context);
+            } else {
+              return landscapeDesign(context);
+            }
+          },
+        ));
+  }
+
+  Column portraitDesign(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        const Divider(
+          height: 50,
+        ),
+        heightBox(),
+        weightBox(),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: FloatingActionButton.extended(
+              onPressed: () {
+                if ((weightController.text.isNotEmpty &&
+                        heightController.text.isNotEmpty) &&
+                    (currentHeight != 0 && currentWeight != 0)) {
+                  showBMI();
+                } else {
+                  SnackBar snackBar = const SnackBar(
+                    content: Text("Invalid Data, Please enter some data"),
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                }
+              },
+              label: const Text("Calculate BMI")),
+        )
+      ],
+    );
+  }
+
+  Widget landscapeDesign(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         mainAxisSize: MainAxisSize.max,
         children: [
           const Divider(
             height: 50,
           ),
-          // Row(
-          //   children: [
-          //     genderBox("Male", Colors.blueGrey, Colors.blue),
-          //     genderBox("Female", Colors.blueGrey, Colors.blue)
-          //   ],
-          // ),
-          heightBox(),
-          weightBox(),
+          Row(
+            children: [
+              heightBox(),
+              weightBox(),
+            ],
+          ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: FilledButton(
+            padding: const EdgeInsets.all(16.0),
+            child: FloatingActionButton.extended(
                 onPressed: () {
                   if ((weightController.text.isNotEmpty &&
                           heightController.text.isNotEmpty) &&
@@ -99,7 +141,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   }
                 },
-                child: const Text("Calculate BMI")),
+                label: const Text("Calculate BMI")),
           )
         ],
       ),
@@ -164,6 +206,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   decimal: true, signed: false),
             ),
           ),
+          const Text(
+            "Height",
+            style: TextStyle(fontSize: 20),
+          ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
@@ -217,6 +263,10 @@ class _MyHomePageState extends State<MyHomePage> {
               keyboardType: const TextInputType.numberWithOptions(
                   decimal: true, signed: false),
             ),
+          ),
+          const Text(
+            "Weight",
+            style: TextStyle(fontSize: 20),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -299,76 +349,156 @@ class _MyHomePageState extends State<MyHomePage> {
       pageBuilder: (context, animation, secondaryAnimation) {
         return Scaffold(
           body: Container(
-            color: Colors.grey.shade400,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                SfRadialGauge(
-                    enableLoadingAnimation: true,
-                    animationDuration: 3500,
-                    axes: <RadialAxis>[
-                      RadialAxis(
-                        annotations: [
-                          GaugeAnnotation(
-                              angle: 90,
-                              positionFactor: 0.5,
-                              widget: Text(
-                                bmi.toStringAsFixed(2),
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 20),
-                              ))
-                        ],
-                        minimum: 0,
-                        maximum: 50,
-                        ranges: <GaugeRange>[
-                          GaugeRange(
-                              startValue: 0,
-                              endValue: 18.5,
-                              color: Colors.blue,
-                              startWidth: 10,
-                              endWidth: 10),
-                          GaugeRange(
-                              startValue: 18.5,
-                              endValue: 25,
-                              color: Colors.green,
-                              startWidth: 10,
-                              endWidth: 10),
-                          GaugeRange(
-                              startValue: 25,
-                              endValue: 30,
-                              color: Colors.yellow,
-                              startWidth: 10,
-                              endWidth: 10),
-                          GaugeRange(
-                              startValue: 30,
-                              endValue: 35,
-                              color: Colors.orange,
-                              startWidth: 10,
-                              endWidth: 10),
-                          GaugeRange(
-                              startValue: 35,
-                              endValue: 50,
-                              color: Colors.deepOrange,
-                              startWidth: 10,
-                              endWidth: 10)
-                        ],
-                        pointers: <GaugePointer>[
-                          NeedlePointer(
-                            value: bmi,
-                          )
-                        ],
-                      )
-                    ]),
-                results(bmi),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("Dismiss"),
-                ),
-              ],
-            ),
-          ),
+              color: Colors.grey.shade400,
+              child: OrientationBuilder(
+                builder: (context, orientation) {
+                  if (orientation == Orientation.portrait) {
+                    return portraitResult(bmi, context);
+                  } else {
+                    return landScapeResult(bmi, context);
+                  }
+                },
+              )),
         );
       },
+    );
+  }
+
+  Column portraitResult(double bmi, BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        SfRadialGauge(
+            enableLoadingAnimation: true,
+            animationDuration: 3500,
+            axes: <RadialAxis>[
+              RadialAxis(
+                annotations: [
+                  GaugeAnnotation(
+                      angle: 90,
+                      positionFactor: 0.5,
+                      widget: Text(
+                        bmi.toStringAsFixed(2),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20),
+                      ))
+                ],
+                minimum: 0,
+                maximum: 50,
+                ranges: <GaugeRange>[
+                  GaugeRange(
+                      startValue: 0,
+                      endValue: 18.5,
+                      color: Colors.blue,
+                      startWidth: 10,
+                      endWidth: 10),
+                  GaugeRange(
+                      startValue: 18.5,
+                      endValue: 25,
+                      color: Colors.green,
+                      startWidth: 10,
+                      endWidth: 10),
+                  GaugeRange(
+                      startValue: 25,
+                      endValue: 30,
+                      color: Colors.yellow,
+                      startWidth: 10,
+                      endWidth: 10),
+                  GaugeRange(
+                      startValue: 30,
+                      endValue: 35,
+                      color: Colors.orange,
+                      startWidth: 10,
+                      endWidth: 10),
+                  GaugeRange(
+                      startValue: 35,
+                      endValue: 50,
+                      color: Colors.deepOrange,
+                      startWidth: 10,
+                      endWidth: 10)
+                ],
+                pointers: <GaugePointer>[
+                  NeedlePointer(
+                    value: bmi,
+                  )
+                ],
+              )
+            ]),
+        results(bmi),
+        ElevatedButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Dismiss"),
+        ),
+      ],
+    );
+  }
+
+  Row landScapeResult(double bmi, BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        SfRadialGauge(
+            enableLoadingAnimation: true,
+            animationDuration: 3500,
+            axes: <RadialAxis>[
+              RadialAxis(
+                annotations: [
+                  GaugeAnnotation(
+                      angle: 90,
+                      positionFactor: 0.5,
+                      widget: Text(
+                        bmi.toStringAsFixed(2),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20),
+                      ))
+                ],
+                minimum: 0,
+                maximum: 50,
+                ranges: <GaugeRange>[
+                  GaugeRange(
+                      startValue: 0,
+                      endValue: 18.5,
+                      color: Colors.blue,
+                      startWidth: 10,
+                      endWidth: 10),
+                  GaugeRange(
+                      startValue: 18.5,
+                      endValue: 25,
+                      color: Colors.green,
+                      startWidth: 10,
+                      endWidth: 10),
+                  GaugeRange(
+                      startValue: 25,
+                      endValue: 30,
+                      color: Colors.yellow,
+                      startWidth: 10,
+                      endWidth: 10),
+                  GaugeRange(
+                      startValue: 30,
+                      endValue: 35,
+                      color: Colors.orange,
+                      startWidth: 10,
+                      endWidth: 10),
+                  GaugeRange(
+                      startValue: 35,
+                      endValue: 50,
+                      color: Colors.deepOrange,
+                      startWidth: 10,
+                      endWidth: 10)
+                ],
+                pointers: <GaugePointer>[
+                  NeedlePointer(
+                    value: bmi,
+                  )
+                ],
+              )
+            ]),
+        results(bmi),
+        ElevatedButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Dismiss"),
+        ),
+      ],
     );
   }
 
@@ -397,14 +527,17 @@ class _MyHomePageState extends State<MyHomePage> {
         condtionColor = Colors.red;
         break;
     }
-    return Card(
-      color: condtionColor,
-      elevation: 10,
-      child: Center(
-          child: Text(
-        condition,
-        style: const TextStyle(fontSize: 40),
-      )),
+    return SizedBox(
+      height: 80,
+      child: Card(
+        color: condtionColor,
+        elevation: 10,
+        child: Center(
+            child: Text(
+          condition,
+          style: const TextStyle(fontSize: 40),
+        )),
+      ),
     );
   }
 }
